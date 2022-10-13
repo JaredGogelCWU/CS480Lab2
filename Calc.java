@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 
 public class Calc implements ActionListener {
 
+    //Setting up the frame and buttons
     JFrame frame;
     JTextField textfield;
     JButton[] numButtons = new JButton[10];
@@ -30,13 +31,13 @@ public class Calc implements ActionListener {
     JButton lBracButton;
     JButton rBracButton;
     JPanel panel;
-
+    //Setting the font for the frame
     Font myFont = new Font("Times New Roman", Font.BOLD, 30);
+    //Storage doubles
     double num1 = 0;
-    double num2 = 0;
     double result = 0;
-    String operator;
 
+    //Calculator Constructor that makes the frame, text field, panel, and applies the font
     Calc(){
 
         frame = new JFrame("Calculator");
@@ -115,7 +116,7 @@ public class Calc implements ActionListener {
         equButton.setBounds(450,600,200,50);
         decButton.setBounds(250,600,200,50);
 
-
+        //Creating a panel to separate the explicit operators and numbers
         panel = new JPanel();
         panel.setBounds(50,100,600,400);
         panel.setLayout(new GridLayout(5,4, 15,15));
@@ -155,12 +156,13 @@ public class Calc implements ActionListener {
         frame.add(textfield);
         frame.setVisible(true);
     }
-
+    //Main method to create the Calculator
     public static void main(String[] args) {
-        Calc Calulator = new Calc();
+        Calc Calculator = new Calc();
     }
-    //Eval Function I found and modified to work with all the required functions
-    public static double eval(final String str) {
+    //Eval method I found and modified to work with all the required functions
+    //Found at https://stackoverflow.com/questions/3422673/how-to-evaluate-a-math-expression-given-in-string-form
+    public static double evalu(final String str) {
         return new Object() {
             int pos = -1, ch;
 
@@ -218,6 +220,10 @@ public class Calc implements ActionListener {
                 if (eat('(')) { // parentheses
                     x = parseExpression();
                     if (!eat(')')) throw new RuntimeException("Missing ')'");
+                //Added functionality for curly brackets in the calculator
+                } else if (eat('{')) {
+                    x = parseExpression();
+                    if (!eat('}')) throw new RuntimeException("Missing '}'");
                 } else if ((ch >= '0' && ch <= '9') || ch == '.') { // numbers
                     while ((ch >= '0' && ch <= '9') || ch == '.') nextChar();
                     x = Double.parseDouble(str.substring(startPos, this.pos));
@@ -234,6 +240,10 @@ public class Calc implements ActionListener {
                     else if (func.equals("sin")) x = Math.sin(Math.toRadians(x));
                     else if (func.equals("cos")) x = Math.cos(Math.toRadians(x));
                     else if (func.equals("tan")) x = Math.tan(Math.toRadians(x));
+                    //Added in a cot function, ln function, and log10 function
+                    else if (func.equals("cot")) x = 1.0 / Math.tan(Math.toRadians(x));
+                    else if (func.equals("ln")) x = Math.log(x);
+                    else if (func.equals("log")) x = Math.log10(x);
                     else throw new RuntimeException("Unknown function: " + func);
                 } else {
                     throw new RuntimeException("Unexpected: " + (char)ch);
@@ -245,17 +255,16 @@ public class Calc implements ActionListener {
             }
         }.parse();
     }
-
+    //Method that performs certain functions based on what buttons are pressed
     @Override
     public void actionPerformed(ActionEvent e) {
-
+        //Adding specific characters to the text field when corresponding button is pressed
         for (int i = 0; i < 10; i++)
         {
             if(e.getSource() == numButtons[i]){
                 textfield.setText(textfield.getText().concat(String.valueOf(i)));
             }
         }
-
         if (e.getSource() == decButton){
             textfield.setText(textfield.getText().concat("."));
         }
@@ -274,118 +283,60 @@ public class Calc implements ActionListener {
 
         if (e.getSource() == addButton){
             textfield.setText(textfield.getText().concat("+"));
-            //num1 = Double.parseDouble(textfield.getText());
-            //operator = "+";
-            //textfield.setText("");
         }
 
         if (e.getSource() == subButton){
             textfield.setText(textfield.getText().concat("-"));
-            //num1 = Double.parseDouble(textfield.getText());
-            //operator = "-";
-            //textfield.setText("");
         }
 
         if (e.getSource() == sinButton){
             textfield.setText(textfield.getText().concat("sin"));
-            //num1 = Double.parseDouble(textfield.getText());
-            //operator = "sin";
-
         }
 
         if (e.getSource() == cosButton){
             textfield.setText(textfield.getText().concat("cos"));
-            //num1 = Double.parseDouble(textfield.getText());
-            //operator = "cos";
-
         }
 
         if (e.getSource() == tanButton){
             textfield.setText(textfield.getText().concat("tan"));
-            //num1 = Double.parseDouble(textfield.getText());
-            //operator = "tan";
-
         }
 
         if (e.getSource() == cotButton){
             textfield.setText(textfield.getText().concat("cot"));
-            //num1 = Double.parseDouble(textfield.getText());
-            //operator = "cot";
-
         }
 
         if (e.getSource() == lnButton){
-            num1 = Double.parseDouble(textfield.getText());
-            operator = "ln";
-
+            textfield.setText(textfield.getText().concat("ln"));
         }
 
         if (e.getSource() == log10Button){
-            num1 = Double.parseDouble(textfield.getText());
-            operator = "log10";
-
+            textfield.setText(textfield.getText().concat("log"));
         }
 
         if (e.getSource() == mulButton){
             textfield.setText(textfield.getText().concat("*"));
-            //num1 = Double.parseDouble(textfield.getText());
-            //operator = "*";
-            //textfield.setText("");
         }
 
         if (e.getSource() == divButton){
             textfield.setText(textfield.getText().concat("/"));
-
         }
-
+        if (e.getSource() == expButton){
+            textfield.setText(textfield.getText().concat("^"));
+        }
+        /*Takes the text field as a string
+        / Uses the evaul method to evaluate the math expression
+        / Sends the result to the text field and stores the answer
+        */
         if (e.getSource() == equButton){
-            //num2 = Double.parseDouble(textfield.getText());
-
-            /*switch(operator) {
-                case"+":
-                    result = num1 + num2;
-                    break;
-                case"-":
-                    result = num1 - num2;
-                    break;
-                case"*":
-                    result = num1 * num2;
-                    break;
-                case"/":
-                    result = num1 / num2;
-                    break;
-                case"sin":
-                    num1 = Math.toRadians(num1);
-                    result = Math.sin(num1);
-                    break;
-                case"cos":
-                    num1 = Math.toRadians(num1);
-                    result = Math.cos(num1);
-                    break;
-                case"tan":
-                    num1 = Math.toRadians(num1);
-                    result = Math.tan(num1);
-                    break;
-                case"cot":
-                    num1 = Math.toRadians(num1);
-                    result = 1.0 / Math.tan(num1);
-                    break;
-                case"ln":
-                    result = Math.log(num1);
-                    break;
-                case"log10":
-                    result = Math.log10(num1);
-                    break;
-            }*/
-            result = eval(textfield.getText());
+            result = evalu(textfield.getText());
             textfield.setText(String.valueOf(result));
             num1 = result;
         }
-
+        //clears the text field of all characters
         if (e.getSource() == clrButton){
             textfield.setText("");
         }
-
+        //deletes characters right to left from text field
         if(e.getSource() == delButton){
             String string = textfield.getText();
             textfield.setText("");
@@ -393,7 +344,7 @@ public class Calc implements ActionListener {
                 textfield.setText(textfield.getText()+string.charAt(i));
             }
         }
-
+        //takes the given number and makes it negative
         if(e.getSource() == negButton){
             double temp = Double.parseDouble(textfield.getText());
             temp*=-1;
